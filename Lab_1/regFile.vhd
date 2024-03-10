@@ -7,22 +7,24 @@ USE IEEE.numeric_std.all;
 ENTITY regFile IS
 	-- numerical constants are defined using generics (to avoid magic nums)
 	GENERIC(
-		addressBits : INTEGER := 5;  -- 0 -> 31
-		dataLength  : INTEGER := 32; -- 32-bit data
-		numOfReg    : INTEGER := 32  -- number of registers = 2 ^ addressBits	
+		addressBits_GEN : INTEGER := 5;  -- 0 -> 31
+		dataLength_GEN  : INTEGER := 32; -- 32-bit data
+		numOfReg_GEN    : INTEGER := 32  -- number of registers = 2 ^ addressBits	
 	);	
 	PORT(
 		-- input signals
-		RsSel  : IN  STD_LOGIC_VECTOR((addressBits - 1) DOWNTO 0); -- read reg 1
-		RtSel  : IN  STD_LOGIC_VECTOR((addressBits - 1) DOWNTO 0); -- read reg 2
-		RdSel  : IN  STD_LOGIC_VECTOR((addressBits - 1) DOWNTO 0); -- write reg
-		WrtEN  : IN  STD_LOGIC; -- write enable
-		DataW  : IN  STD_LOGIC_VECTOR((dataLength - 1) DOWNTO 0); -- write this data in Rd
-		CLK    : IN  STD_LOGIC; -- clock (write on falling and read on rising)		
+		RsSel_IN  : IN  STD_LOGIC_VECTOR((addressBits_GEN - 1) DOWNTO 0); -- read reg 1
+		RtSel_IN  : IN  STD_LOGIC_VECTOR((addressBits_GEN - 1) DOWNTO 0); -- read reg 2
+		RdSel_IN  : IN  STD_LOGIC_VECTOR((addressBits_GEN - 1) DOWNTO 0); -- write reg
+		DataW_IN  : IN  STD_LOGIC_VECTOR((dataLength_GEN - 1) DOWNTO 0); -- write this data in Rd
+
+		-- clock + control signals
+		WrtEN     : IN  STD_LOGIC; -- write enable
+		CLK       : IN  STD_LOGIC; -- clock (write on falling and read on rising)		
 
 		-- output signals
-		DataRs : OUT STD_LOGIC_VECTOR((dataLength - 1) DOWNTO 0); -- data written in Rs
-		DataRt : OUT STD_LOGIC_VECTOR((dataLength - 1) DOWNTO 0)  -- data written in Rd
+		DataRs_OUT : OUT STD_LOGIC_VECTOR((dataLength_GEN - 1) DOWNTO 0); -- data written in Rs
+		DataRt_OUT : OUT STD_LOGIC_VECTOR((dataLength_GEN - 1) DOWNTO 0)  -- data written in Rd
 	);
 
 END regFile;
@@ -30,11 +32,11 @@ END regFile;
 
 ARCHITECTURE regFile_ARCH OF regFile IS
 	-- define a type as a 1D array of numOfReg elements 
-	TYPE regFile_TYPE IS ARRAY(0 TO (numOfReg - 1)) OF STD_LOGIC_VECTOR((dataLength - 1) DOWNTO 0);
+	TYPE regFile_TYPE IS ARRAY(0 TO (numOfReg_GEN - 1)) OF STD_LOGIC_VECTOR((dataLength_GEN - 1) DOWNTO 0);
 BEGIN
 	PROCESS(CLK, WrtEN) IS
 		-- define registerFile variable to hold register data as a 1D array of numOfReg register elements
-		VARIABLE registerFile : regFile_TYPE := (
+		VARIABLE registerFile_VAR : regFile_TYPE := (
 							 X"00000000",
 							 X"00000001",
 							 X"00000002",
@@ -70,11 +72,11 @@ BEGIN
 							);
 	BEGIN	
 		IF (FALLING_EDGE(CLK) AND WrtEN = '1') THEN -- write data in Rd on falling edge && @ WrtEN = 1
-			registerFile(TO_INTEGER(UNSIGNED(RdSel))) := DataW;
+			registerFile_VAR(TO_INTEGER(UNSIGNED(RdSel_IN))) := DataW_IN;
 		END IF;
 		IF(RISING_EDGE(CLK)) THEN -- read Rs && Rt
-		DataRs <= registerFile(TO_INTEGER(UNSIGNED(RsSel)));
-		DataRt <= registerFile(TO_INTEGER(UNSIGNED(RtSel)));
+		DataRs_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RsSel_IN)));
+		DataRt_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RtSel_IN)));
 		END IF;
 	END PROCESS;
 END regFile_ARCH;
