@@ -81,3 +81,27 @@ BEGIN
 	RdSel_IN_SIG <= "10000";
 	DataW_IN_SIG <= X"AAAAAAAA";
 END testBench_ARCH;
+
+
+
+/* SEQUENCER_PROC : process      
+
+    procedure test (x : integer; y : integer) is
+    begin
+      a <= x;
+      b <= y;
+      wait for 10 ns;
+      
+      report "a = " & integer'image(a)
+        & ", b = " & integer'image(b)
+        & ", q = " & boolean'image(q);
+    end procedure;
+
+  begin
+
+    test(10, 5);
+    test(5, 5);
+    test(5, 10);
+
+    wait;
+  end process; */
