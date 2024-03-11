@@ -59,7 +59,7 @@ BEGIN
 		RdSel_IN 	=> RdSel_IN_SIG,
 		DataW_IN 	=> DataW_IN_SIG,
 		WrtEN    	=> WrtEN,
-		CLK		=> CLK,
+		CLK			=> CLK,
 		DataRs_OUT	=> DataRs_OUT_SIG,
 		DataRt_OUT	=> DataRt_OUT_SIG
 	);
@@ -105,3 +105,8 @@ END testBench_ARCH;
 
     wait;
   end process; */
+  
+  -- case 1: basic read
+  -- case 2: basic write
+  -- case 3: read && write in the same clock cycle
+  -- case 4: read & write the same register in the same clock cycle
