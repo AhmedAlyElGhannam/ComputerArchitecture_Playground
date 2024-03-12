@@ -78,7 +78,9 @@ BEGIN
 			END IF;
 		END IF;
 		-- read Rs && Rt
-		DataRs_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RsSel_IN)));
-		DataRt_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RtSel_IN)));
+		IF (RISING_EDGE(CLK)) THEN
+			DataRs_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RsSel_IN)));
+			DataRt_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RtSel_IN)));
+		END IF;
 	END PROCESS;
 END regFile_ARCH;
