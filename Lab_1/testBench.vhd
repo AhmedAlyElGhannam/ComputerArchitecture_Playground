@@ -19,7 +19,7 @@ ARCHITECTURE testBench_ARCH OF testBench IS
 	CONSTANT dataLength_CON   : INTEGER := 32; 
 	-- number of registers = 2 ^ addressBits
 	CONSTANT numOfReg_CON     : INTEGER := 32; 
-	-- variable for test cases
+	-- signal for test cases
 	--VARIABLE testCase_VAR	  : INTEGER := 1;
 	-- define regFile as a component 
 	COMPONENT regFile
@@ -52,7 +52,8 @@ ARCHITECTURE testBench_ARCH OF testBench IS
 	SIGNAL DataRt_OUT_SIG : STD_LOGIC_VECTOR((dataLength_CON - 1) DOWNTO 0);
 BEGIN
 	-- mapping signals to component ports
-	Test1: regFile PORT MAP (
+	Test1: 
+	regFile PORT MAP (
 		RsSel_IN 	=> RsSel_IN_SIG,
 		RtSel_IN 	=> RtSel_IN_SIG,
 		RdSel_IN 	=> RdSel_IN_SIG,
@@ -63,36 +64,48 @@ BEGIN
 		DataRt_OUT	=> DataRt_OUT_SIG
 	);
 	-- testBench process for CLK		
-	clkCycleProcess : PROCESS(CLK)
-		VARIABLE clkCycleCounter_VAR : INTEGER := 1;
+	clkCycleProcess : 
+	PROCESS(CLK)
 	BEGIN	
 		CLK <= NOT CLK AFTER (clkPeriod_CON / 2);
-		CASE clkCycleCounter_VAR IS
-			WHEN 1 =>
-				-- set values for test case 1
-				RsSel_IN_SIG <= "00111";
-				RtSel_IN_SIG <= "01111";
-				RdSel_IN_SIG <= "00111";
-				DataW_IN_SIG <= X"AAAAAAAA";
-				clkCycleCounter_VAR := clkCycleCounter_VAR + 1;
-				--WAIT FOR 200 ps;
-			WHEN 2 =>
-				-- set values for test case 2
-			WHEN 3 =>
-				-- set values for test case 3
-			WHEN 4 =>
-				-- set values for test case 4
-			WHEN 5 =>
-				-- set values for test case 5
-			WHEN OTHERS =>
-				-- do nothing  
-		END CASE;
 	END PROCESS clkCycleProcess;
 	-- testBench process for WrtEN
-	writeEnableProcess : PROCESS(WrtEN)
+	writeEnableProcess : 
+	PROCESS(WrtEN)
 	BEGIN
 		-- flip WrtEn every 100 ps  
 		WrtEN <= NOT WrtEN AFTER 300 ps;
 	END PROCESS writeEnableProcess;
+	-- testBench process for test cases
+	testCaseProcess:
+	PROCESS 
+		-- define procedure to set input signals values and wait
+		PROCEDURE regFileInputsTest(
+			CONSTANT RsSel_IN_PROC   		: STD_LOGIC_VECTOR((addressBits_CON - 1) DOWNTO 0);
+			CONSTANT RtSel_IN_PROC   		: STD_LOGIC_VECTOR((addressBits_CON - 1) DOWNTO 0);
+			CONSTANT RdSel_IN_PROC   		: STD_LOGIC_VECTOR((addressBits_CON - 1) DOWNTO 0);
+			CONSTANT DataW_IN_PROC   		: STD_LOGIC_VECTOR((dataLength_CON - 1) DOWNTO 0);
+			CONSTANT testCaseDuration_PROC 	: TIME
+		) IS
+		BEGIN
+			-- set inputs by passed values
+			RsSel_IN_SIG <= RsSel_IN_PROC;
+			RtSel_IN_SIG <= RtSel_IN_PROC;
+			RdSel_IN_SIG <= RdSel_IN_PROC;
+			DataW_IN_SIG <= DataW_IN_PROC;
+			-- wait to view results of this test case
+			WAIT FOR testCaseDuration_PROC;
+		END PROCEDURE regFileInputsTest;
+	BEGIN
+		-- Test Case 1: Rs=,Rt=,Rd=,DataWrite=,Duration=
+		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+		-- Test Case 2: Rs=,Rt=,Rd=,DataWrite=,Duration=
+		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+		-- Test Case 3: Rs=,Rt=,Rd=,DataWrite=,Duration=
+		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+		-- Test Case 4: Rs=,Rt=,Rd=,DataWrite=,Duration=
+		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+		-- Test Case 5: Rs=,Rt=,Rd=,DataWrite=,Duration=
+		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+	END PROCESS testCaseProcess;
 END testBench_ARCH;
-
