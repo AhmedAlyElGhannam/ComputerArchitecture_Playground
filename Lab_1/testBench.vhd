@@ -73,8 +73,8 @@ BEGIN
 	writeEnableProcess : 
 	PROCESS(WrtEN)
 	BEGIN
-		-- flip WrtEn every 100 ps  
-		WrtEN <= NOT WrtEN AFTER 300 ps;
+		-- flip WrtEn every 200 ps  
+		WrtEN <= NOT WrtEN AFTER 2 * clkPeriod_CON;
 	END PROCESS writeEnableProcess;
 	-- testBench process for test cases
 	testCaseProcess:
@@ -97,15 +97,17 @@ BEGIN
 			WAIT FOR testCaseDuration_PROC;
 		END PROCEDURE regFileInputsTest;
 	BEGIN
-		-- Test Case 1: Rs=,Rt=,Rd=,DataWrite=,Duration=
-		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
-		-- Test Case 2: Rs=,Rt=,Rd=,DataWrite=,Duration=
-		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
-		-- Test Case 3: Rs=,Rt=,Rd=,DataWrite=,Duration=
-		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
-		-- Test Case 4: Rs=,Rt=,Rd=,DataWrite=,Duration=
-		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
-		-- Test Case 5: Rs=,Rt=,Rd=,DataWrite=,Duration=
-		regFileInputsTest("00111","01111","00111",X"AAAAAAAA",200 ps);
+		-- Test case 1:
+		---- -> read rs && rt && try to write a diff value in rd (will not write successfully until WrtEN is 1)
+		---- -> Rs=7,Rt=8,Rd=9,DataWrite=X"AAAAAAAA",Duration=400ps (4 clk cycles)
+		regFileInputsTest("00111","01000","01001",X"AAAAAAAA",400 ps);
+		-- Test case 2:
+		---- -> read $0 (as rs or rt) then try to write some value in it ($0 value should remain 0)
+		---- -> Rs=0,Rt=1,Rd=0,DataWrite=X"ABCDDCBA",Duration=400ps (4 clk cycles)
+		regFileInputsTest("00000","00001","00000",X"ABCDDCBA",200 ps);
+		-- Test case 3:
+		---- -> read what is in rs and write in rd (first clock cycle should show read and second should show write)
+		---- -> Rs=12,Rt=13,Rd=12,DataWrite=X"EEEEEEEE",Duration=400ps (4 clk cycles)
+		regFileInputsTest("01100","01101","01100",X"EEEEEEEE",400 ps);
 	END PROCESS testCaseProcess;
 END testBench_ARCH;
