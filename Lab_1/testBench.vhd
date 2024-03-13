@@ -97,17 +97,19 @@ BEGIN
 			WAIT FOR testCaseDuration_PROC;
 		END PROCEDURE regFileInputsTest;
 	BEGIN
+		-- Initial wait duration before doing anything
+		WAIT FOR clkPeriod_CON / 4;
 		-- Test case 1:
 		---- -> read rs && rt && try to write a diff value in rd (will not write successfully until WrtEN is 1)
 		---- -> Rs=7,Rt=8,Rd=9,DataWrite=X"AAAAAAAA",Duration=400ps (4 clk cycles)
 		regFileInputsTest("00111","01000","01001",X"AAAAAAAA",400 ps);
 		-- Test case 2:
-		---- -> read $0 (as rs or rt) then try to write some value in it ($0 value should remain 0)
-		---- -> Rs=0,Rt=1,Rd=0,DataWrite=X"ABCDDCBA",Duration=400ps (4 clk cycles)
-		regFileInputsTest("00000","00001","00000",X"ABCDDCBA",200 ps);
+		---- -> read $0 as rs and read $9 as rt then try to write some value in rs ($0 value should remain 0)
+		---- -> Rs=0,Rt=9,Rd=0,DataWrite=X"ABCDDCBA",Duration=400ps (4 clk cycles)
+		regFileInputsTest("00000","01001","00000",X"ABCDDCBA",400 ps);
 		-- Test case 3:
 		---- -> read what is in rs and write in rd (first clock cycle should show read and second should show write)
-		---- -> Rs=12,Rt=13,Rd=12,DataWrite=X"EEEEEEEE",Duration=400ps (4 clk cycles)
-		regFileInputsTest("01100","01101","01100",X"EEEEEEEE",400 ps);
+		---- -> Rs=12,Rt=0,Rd=12,DataWrite=X"EEEEEEEE",Duration=400ps (4 clk cycles)
+		regFileInputsTest("01100","00000","01100",X"EEEEEEEE",400 ps);
 	END PROCESS testCaseProcess;
 END testBench_ARCH;
