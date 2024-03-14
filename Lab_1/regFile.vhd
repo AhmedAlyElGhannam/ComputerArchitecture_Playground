@@ -34,10 +34,7 @@ ARCHITECTURE regFile_ARCH OF regFile IS
 	-- define a type as a 1D array of numOfReg elements 
 	TYPE regFile_TYP IS ARRAY(0 TO (numOfReg_GEN - 1)) OF STD_LOGIC_VECTOR((dataLength_GEN - 1) DOWNTO 0);
 	-- define registerFile signal to hold register data as a 1D array of numOfReg register elements
-BEGIN
-	PROCESS(CLK, WrtEN) IS
-		-- define registerFile variable to hold register data as a 1D array of numOfReg register elements       
-		VARIABLE registerFile_VAR : regFile_TYP := (
+	SIGNAL registerFile_SIG : regFile_TYP := (
 							X"00000000",
 							X"00000001",
 							X"00000002",
@@ -71,16 +68,22 @@ BEGIN
 							X"0000001E",
 							X"0000001F"
 							);
+BEGIN
+	writeProcess: -- write data
+	PROCESS(CLK) IS
 	BEGIN	
 		IF (FALLING_EDGE(CLK) AND WrtEN = '1') THEN -- write data in Rd on falling edge && @ WrtEN = 1
 			IF (RdSel_IN /= "00000") THEN -- if destination is NOT reg_zero, write 
-				registerFile_VAR(TO_INTEGER(UNSIGNED(RdSel_IN))) := DataW_IN;
+				registerFile_SIG(TO_INTEGER(UNSIGNED(RdSel_IN))) <= DataW_IN;
 			END IF;
 		END IF;
+	END PROCESS writeProcess;
+	readProcess: -- read data
+	PROCESS IS
+	BEGIN
 		-- read Rs && Rt
-		IF (RISING_EDGE(CLK)) THEN
-			DataRs_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RsSel_IN)));
-			DataRt_OUT <= registerFile_VAR(TO_INTEGER(UNSIGNED(RtSel_IN)));
-		END IF;
+		DataRs_OUT <= registerFile_SIG(TO_INTEGER(UNSIGNED(RsSel_IN)));
+		DataRt_OUT <= registerFile_SIG(TO_INTEGER(UNSIGNED(RtSel_IN)));
+		WAIT FOR 1 ps; -- has to wait to avoid infinite loop warning
 	END PROCESS;
 END regFile_ARCH;
