@@ -1,7 +1,7 @@
-cuda:
+cuda_compile:
 	nvcc cuda.cu -o cuda
 
-nocuda:
+nocuda_compile:
 	g++ nocuda.cpp -o nocuda
 
 stack_resize:

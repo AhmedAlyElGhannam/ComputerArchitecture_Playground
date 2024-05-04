@@ -2,11 +2,12 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <cuda_runtime.h>
 
 using namespace std;
 
 // try N = 5, 50, 500
-#define N 2
+#define N 5000
 
 // available matrix operations
 typedef enum
@@ -15,46 +16,52 @@ typedef enum
     MUL = 2
 } matOp;
 
-__global__ void matrixMulCUDA(int* matrixA, int* matrixB, int* matrixRes) 
+__global__ void matrixMulCUDA(unsigned int* matrixA, unsigned int* matrixB, unsigned int* matrixRes) 
 {
     // Compute each thread's global row and column index
     int rowIndex = blockIdx.y * blockDim.y + threadIdx.y;
     int colIndex = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Iterate over row, and down column
-    matrixRes[rowIndex][colIndex] = 0;
-    for (int k = 0; k < N; k++) 
+    if (rowIndex < N && colIndex < N) 
     {
-        // Accumulate results for a single element
-        matrixRes[rowIndex][colIndex] += matrixA[rowIndex][k] * matrixB[k][colIndex];
+        matrixRes[rowIndex * N + colIndex] = 0;
+        for (int k = 0; k < N; k++) 
+        {
+            // Accumulate results for a single element
+            matrixRes[rowIndex * N + colIndex] += matrixA[rowIndex * N + k] * matrixB[k * N + colIndex];
+        }
     }
 }
 /**
 if condition to see if row && col are less than N
 then simply add
 */
-__global__ void matrixAddCUDA(int* matrixA, int* matrixB, int* matrixRes) 
+__global__ void matrixAddCUDA(unsigned int* matrixA, unsigned int* matrixB, unsigned int* matrixRes) 
 {
     // Compute each thread's global row and column index
     int rowIndex = blockIdx.y * blockDim.y + threadIdx.y;
     int colIndex = blockIdx.x * blockDim.x + threadIdx.x;
 
-    // simply add
-    matrixRes[rowIndex * N + colIndex] = matrixA[rowIndex * N + colIndex] + matrixB[rowIndex * N + colIndex];
+    if (rowIndex < N && colIndex < N)
+    {
+        // simply add
+        matrixRes[rowIndex * N + colIndex] = matrixA[rowIndex * N + colIndex] + matrixB[rowIndex * N + colIndex];
+    }
 }
 
 // h_sth => host variable (PC)
 // d_sth => device variable (GPU)
 
-void matrixOperationCudaWrapper(const int (&h_matrixA)[N][N], const int (&h_matrixB)[N][N], int (&h_matrixRes)[N][N], unsigned char operation)
+void matrixOperationCudaWrapper(const unsigned int (&h_matrixA)[N][N], const unsigned int (&h_matrixB)[N][N], unsigned int (&h_matrixRes)[N][N], unsigned char operation)
 {
     // create pointers to gpu
-    int* d_cudaA = 0;
-    int* d_cudaB = 0;
-    int* d_cudaRes = 0;
+    unsigned int* d_cudaA = 0;
+    unsigned int* d_cudaB = 0;
+    unsigned int* d_cudaRes = 0;
 
     // defining size
-    size_t sizeInBytes = N * N * sizeof(int);
+    size_t sizeInBytes = N * N * sizeof(unsigned int);
 
     // allocate memory in gpu
     cudaMalloc((void**)(&d_cudaA), sizeInBytes);
@@ -62,8 +69,8 @@ void matrixOperationCudaWrapper(const int (&h_matrixA)[N][N], const int (&h_matr
     cudaMalloc((void**)(&d_cudaRes), sizeInBytes);
 
     // copy vectors into gpu cudaMemcpy(d_input, inputImg.data, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_cudaA, &h_matrixA, sizeInBytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_cudaB, &h_matrixB, sizeInBytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_cudaA, h_matrixA, sizeInBytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_cudaB, h_matrixB, sizeInBytes, cudaMemcpyHostToDevice);
 
     // defining CTA and grid dimensions
     int threads = 16;
@@ -85,7 +92,7 @@ void matrixOperationCudaWrapper(const int (&h_matrixA)[N][N], const int (&h_matr
     }
         
     // copy result from gpu memory
-    cudaMemcpy(&h_matrixRes, d_cudaRes, sizeInBytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_matrixRes, d_cudaRes, sizeInBytes, cudaMemcpyDeviceToHost);
 
     // free allocated gpu memory
     cudaFree(d_cudaA);
@@ -95,18 +102,18 @@ void matrixOperationCudaWrapper(const int (&h_matrixA)[N][N], const int (&h_matr
     return;
 }
 
-void populateMatrix(int (&matrix)[N][N]) 
+void populateMatrix(unsigned int (&matrix)[N][N]) 
 {
     for (int i = 0; i < N; i++) 
     {
         for (int j = 0; j < N; j++)
         {
-            matrix[i][j] = rand() % 100; // Generate random numbers between 0 and N-1
+            matrix[i][j] = rand() % 50; // Generate random numbers between 0 and N-1
         }
     }
 }
 
-void printMatrix(const int (&matrix)[N][N]) 
+void printMatrix(const unsigned int (&matrix)[N][N]) 
 {
     for (int i = 0; i < N; i++) 
     {
@@ -118,7 +125,7 @@ void printMatrix(const int (&matrix)[N][N])
     }
 }
 
-void csvMatrix(const int (&matrix)[N][N], const char *filename) {
+void csvMatrix(const unsigned int (&matrix)[N][N], const char *filename) {
     std::ofstream file(filename);
     if (!file.is_open()) 
     {
@@ -147,11 +154,11 @@ int main()
     srand(time(NULL));
 
     // define matrices
-    int matA[N][N];
-    int matB[N][N];
-    int matC[N][N];
-    int matRes[N][N];
-    int matTemp[N][N];
+    unsigned int matA[N][N];
+    unsigned int matB[N][N];
+    unsigned int matC[N][N];
+    unsigned int matRes[N][N];
+    unsigned int matTemp[N][N];
 
     // populate matrix A && B
     populateMatrix(matA);
@@ -163,17 +170,17 @@ int main()
     csvMatrix(matB, "MatrixB.csv");
     csvMatrix(matC, "MatrixC.csv");
     
-    // // C * ((A * B) + (B * A))
-    // multMatrix(matA, matB, matRes); // A * B = res
+    // C * ((A * B) + (B * A))
+    matrixOperationCudaWrapper(matA, matB, matRes, MUL); // A * B = res
     
-    // multMatrix(matB, matA, matTemp); // B * A = temp
+    matrixOperationCudaWrapper(matB, matA, matTemp, MUL); // B * A = temp
     
-    // addMatrix(matRes, matTemp, matTemp); // res + temp = temp
+    matrixOperationCudaWrapper(matRes, matTemp, matTemp, ADD); // res + temp = temp
 
-    // multMatrix(matC, matTemp, matRes); // C * temp = res
+    matrixOperationCudaWrapper(matC, matTemp, matRes, MUL); // C * temp = res
     
-    // // output matrix C result for reference
-    // csvMatrix(matRes, "Result.csv");
+    // output matrix C result for reference
+    csvMatrix(matRes, "Result.csv");
 
     return 0;
 }
