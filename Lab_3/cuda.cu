@@ -7,7 +7,7 @@
 using namespace std;
 
 // try N = 50 100 500 1000 2000 5000
-#define N 4500
+#define N 4000
 
 // available matrix operations
 typedef enum
@@ -70,8 +70,8 @@ void matrixOperationCudaWrapper(const unsigned int (&h_matrixA)[N][N], const uns
     cudaMemcpy(d_cudaB, h_matrixB, sizeInBytes, cudaMemcpyHostToDevice);
 
     // defining CTA and grid dimensions
-    int threads = 16;
-    int blocks = (N + threads - 1) / threads;
+    int threads = 32;
+    int blocks = 128;
 
     // setting up kernel launch parameters
     dim3 BLOCKS(blocks, blocks);
