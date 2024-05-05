@@ -4,10 +4,8 @@
 #include <fstream>
 
 using namespace std;
-
-// try N = 5, 50, 500
-// a jump from N=1000 to N=2000 yields 10x the time
-#define N 3000
+// 50, 100, 500, 1000, 2000, and 5000.
+#define N 4500 // matrix row/col
 
 void populateMatrix(unsigned int (&matrix)[N][N]) 
 {
@@ -20,7 +18,7 @@ void populateMatrix(unsigned int (&matrix)[N][N])
     }
 }
 
-void printMatrix(unsigned int (&matrix)[N][N]) 
+void printMatrix(const unsigned int (&matrix)[N][N]) 
 {
     for (int i = 0; i < N; i++) 
     {
@@ -32,7 +30,7 @@ void printMatrix(unsigned int (&matrix)[N][N])
     }
 }
 
-void addMatrix(unsigned int (&matrixA)[N][N], unsigned int (&matrixB)[N][N], unsigned int (&matrixC)[N][N])
+void addMatrix(const unsigned int (&matrixA)[N][N], const unsigned int (&matrixB)[N][N], unsigned int (&matrixC)[N][N])
 {
     for (int i = 0; i < N; i++)
     {
@@ -43,7 +41,7 @@ void addMatrix(unsigned int (&matrixA)[N][N], unsigned int (&matrixB)[N][N], uns
     }
 }
 
-void multMatrix(unsigned int (&matrixA)[N][N], unsigned int (&matrixB)[N][N], unsigned int (&matrixC)[N][N])
+void multMatrix(const unsigned int (&matrixA)[N][N], const unsigned int (&matrixB)[N][N], unsigned int (&matrixC)[N][N])
 {
     for (int i = 0; i < N; i++)
     {
@@ -58,7 +56,7 @@ void multMatrix(unsigned int (&matrixA)[N][N], unsigned int (&matrixB)[N][N], un
     }
 }
 
-void csvMatrix(unsigned int (&matrix)[N][N], const char *filename) {
+void csvMatrix(const unsigned int (&matrix)[N][N], const char *filename) {
     std::ofstream file(filename);
     if (!file.is_open()) 
     {

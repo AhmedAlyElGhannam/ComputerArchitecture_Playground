@@ -3,10 +3,11 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls   s/call   s/call  name    
- 99.39    376.17   376.17        3   125.39   125.39  multMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000])
-  0.02    376.26     0.09        4     0.02     0.02  csvMatrix(unsigned int (&) [3000][3000], char const*)
-  0.02    376.34     0.08        3     0.03     0.03  populateMatrix(unsigned int (&) [3000][3000])
-  0.01    376.36     0.02        1     0.02     0.02  addMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000])
+ 99.46   1470.95  1470.95        3   490.32   490.32  multMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000])
+  0.01   1471.12     0.17        4     0.04     0.04  csvMatrix(unsigned int const (&) [5000][5000], char const*)
+  0.01   1471.26     0.14        3     0.05     0.05  populateMatrix(unsigned int (&) [5000][5000])
+  0.00   1471.32     0.06        1     0.06     0.06  addMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000])
+  0.00   1471.35     0.03                             _init
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -44,27 +45,30 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 2 byte(s) for 0.00% of 376.36 seconds
+granularity: each sample hit covers 2 byte(s) for 0.00% of 1471.35 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]    100.0    0.00  376.36                 main [1]
-              376.17    0.00       3/3           multMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000]) [2]
-                0.09    0.00       4/4           csvMatrix(unsigned int (&) [3000][3000], char const*) [3]
-                0.08    0.00       3/3           populateMatrix(unsigned int (&) [3000][3000]) [4]
-                0.02    0.00       1/1           addMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000]) [5]
+[1]    100.0    0.00 1471.32                 main [1]
+             1470.95    0.00       3/3           multMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [2]
+                0.17    0.00       4/4           csvMatrix(unsigned int const (&) [5000][5000], char const*) [3]
+                0.14    0.00       3/3           populateMatrix(unsigned int (&) [5000][5000]) [4]
+                0.06    0.00       1/1           addMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [5]
 -----------------------------------------------
-              376.17    0.00       3/3           main [1]
-[2]     99.9  376.17    0.00       3         multMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000]) [2]
+             1470.95    0.00       3/3           main [1]
+[2]    100.0 1470.95    0.00       3         multMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [2]
 -----------------------------------------------
-                0.09    0.00       4/4           main [1]
-[3]      0.0    0.09    0.00       4         csvMatrix(unsigned int (&) [3000][3000], char const*) [3]
+                0.17    0.00       4/4           main [1]
+[3]      0.0    0.17    0.00       4         csvMatrix(unsigned int const (&) [5000][5000], char const*) [3]
 -----------------------------------------------
-                0.08    0.00       3/3           main [1]
-[4]      0.0    0.08    0.00       3         populateMatrix(unsigned int (&) [3000][3000]) [4]
+                0.14    0.00       3/3           main [1]
+[4]      0.0    0.14    0.00       3         populateMatrix(unsigned int (&) [5000][5000]) [4]
 -----------------------------------------------
-                0.02    0.00       1/1           main [1]
-[5]      0.0    0.02    0.00       1         addMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000]) [5]
+                0.06    0.00       1/1           main [1]
+[5]      0.0    0.06    0.00       1         addMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      0.0    0.03    0.00                 _init [6]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -157,5 +161,5 @@ notice and this notice are preserved.
 
 Index by function name
 
-   [2] multMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000]) [5] addMatrix(unsigned int (&) [3000][3000], unsigned int (&) [3000][3000], unsigned int (&) [3000][3000])
-   [4] populateMatrix(unsigned int (&) [3000][3000]) [3] csvMatrix(unsigned int (&) [3000][3000], char const*)
+   [2] multMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [5] addMatrix(unsigned int const (&) [5000][5000], unsigned int const (&) [5000][5000], unsigned int (&) [5000][5000]) [6] _init
+   [4] populateMatrix(unsigned int (&) [5000][5000]) [3] csvMatrix(unsigned int const (&) [5000][5000], char const*)

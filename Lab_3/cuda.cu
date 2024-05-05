@@ -6,8 +6,8 @@
 
 using namespace std;
 
-// try N = 5, 50, 500
-#define N 5000
+// try N = 50 100 500 1000 2000 5000
+#define N 4500
 
 // available matrix operations
 typedef enum
@@ -33,10 +33,7 @@ __global__ void matrixMulCUDA(unsigned int* matrixA, unsigned int* matrixB, unsi
         }
     }
 }
-/**
-if condition to see if row && col are less than N
-then simply add
-*/
+
 __global__ void matrixAddCUDA(unsigned int* matrixA, unsigned int* matrixB, unsigned int* matrixRes) 
 {
     // Compute each thread's global row and column index
@@ -68,7 +65,7 @@ void matrixOperationCudaWrapper(const unsigned int (&h_matrixA)[N][N], const uns
     cudaMalloc((void**)(&d_cudaB), sizeInBytes);
     cudaMalloc((void**)(&d_cudaRes), sizeInBytes);
 
-    // copy vectors into gpu cudaMemcpy(d_input, inputImg.data, bytes, cudaMemcpyHostToDevice);
+    // copy vectors into gpu
     cudaMemcpy(d_cudaA, h_matrixA, sizeInBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_cudaB, h_matrixB, sizeInBytes, cudaMemcpyHostToDevice);
 
