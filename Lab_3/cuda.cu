@@ -6,8 +6,9 @@
 
 using namespace std;
 
+
 // try N = 50 100 500 1000 2000 5000
-#define N 4000
+#define N 16384
 
 // available matrix operations
 typedef enum
@@ -70,7 +71,7 @@ void matrixOperationCudaWrapper(const unsigned int (&h_matrixA)[N][N], const uns
     cudaMemcpy(d_cudaB, h_matrixB, sizeInBytes, cudaMemcpyHostToDevice);
 
     // defining CTA and grid dimensions
-    int threads = 32;
+    int threads = 8;
     int blocks = 128;
 
     // setting up kernel launch parameters
@@ -105,7 +106,7 @@ void populateMatrix(unsigned int (&matrix)[N][N])
     {
         for (int j = 0; j < N; j++)
         {
-            matrix[i][j] = rand() % 50; // Generate random numbers between 0 and N-1
+            matrix[i][j] = rand() % 10; // Generate random numbers between 0 and N-1
         }
     }
 }
