@@ -1,6 +1,6 @@
 # ComputerArchitecture_Playground
 
-This repository contains two labs (the 3rd one is a bit irrelevant) taken during Computer Architecture Course taught in Faculty of Engineering Alexandria University, Communications & Electronics Engineering Program. 
+This repository contains two labs (the one left out is a bit irrelevant) taken during Computer Architecture Course taught in Faculty of Engineering Alexandria University, Communications & Electronics Engineering Program. 
 
 ## Lab 1: Description
 Lab 1 is a register file (32 * 32-bit) for MIPS-32 architecture and its testbench written in VHDL. The folder contains both VHDL files as well as a detailed lab report.
